@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Budget Tracker PWA</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js" defer></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+<link rel="stylesheet" href="https://www.freeiconspng.com/uploads/dollar-sign-icon-png-22.png">
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+<header class="bg-purple-600 text-white p-4 text-xl font-bold flex justify-between items-center">
+  <span id="headerTitle">Budget Tracker</span>
+  <button id="logoutBtn" class="hidden underline decoration-red-500 underline-offset-4 px-3 py-1 rounded">Logout</button>
+</header>
+
+<main class="flex-1 p-4">
+
+
+ <!-- Authentication -->
+<section id="auth-section" class="space-y-4">
+  <h2 class="text-lg font-semibold">Login / Sign Up</h2>
+  <input type="email" id="email" placeholder="Enter email" class="w-full p-2 border rounded">
+  <input type="text" id="username" placeholder="Enter username" class="w-full p-2 border rounded">
+  <input type="password" id="password" placeholder="Enter password" class="w-full p-2 border rounded">
+  
+  <button id="loginBtn" class="w-full bg-purple-800 text-white p-2 rounded">Login / Sign Up</button>
+
+  <p class="text-center font-semibold">or</p>
+  <button id="facebookBtn" class="w-full bg-blue-600 text-white p-2 rounded flex justify-center items-center gap-2">
+    <i class="fa-brands fa-facebook"></i> Login with Facebook
+  </button>
+
+  <p id="loginError" class="text-red-500 text-sm hidden"></p>
+</section>
+
+<!-- Logout Confirmation Modal -->
+<div
+  id="logoutModal"
+  class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 transition-opacity duration-300"
+>
+  <div
+    id="logoutCard"
+    class="bg-white p-6 rounded-2xl shadow-xl w-80 text-center space-y-4 transform scale-90 opacity-0 transition-all duration-300 ease-out"
+  >
+    <p class="font-semibold text-gray-800 text-lg">
+      Do you want to log out?
+    </p>
+    <div class="flex justify-center gap-5">
+      <button
+        id="confirmLogout"
+        class="bg-red-600 text-white px-4 py-2 rounded rounded-2xl hover:bg-red-700 transition"
+      >
+        Log out
+      </button>
+      <button
+        id="cancelLogout"
+        class="bg-gray-300 px-4 py-2 rounded rounded-2xl hover:bg-gray-400 transition"
+      >
+        cancel
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Dashboard -->
+  <section id="dashboard" class="hidden space-y-4">
+
+    <!-- Category Toggle Button -->
+    <div class="flex justify-end">
+      <button id="toggleCategoryBtn" class="bg-purple-600 text-white px-4 py-2 rounded">Manage Categories</button>
+    </div>
+
+    <!-- Category Card -->
+     <div id="categoryCard" class="bg-white p-4 rounded shadow space-y-2 hidden transform scale-95 opacity-0 transition-all duration-300 ease-in-out">
+      <div class="flex justify-between items-center">
+        <h3 class="font-semibold">Create Category</h3>
+        <button id="closeCategoryBtn" class="text-red-500 px-3 py-1 rounded"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="flex space-x-2 mt-2">
+        <input type="text" id="newCategory" placeholder="New category" class="w-72 p-2 border rounded">
+        <button id="addCategoryBtn" class="bg-purple-600 text-white px-3 rounded">Add</button>
+      </div>
+      <div id="categoriesList" class="flex flex-wrap gap-2 mt-2"></div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="bg-white p-4 px-12 rounded shadow flex items-center justify-between">
+        <i class="fa-solid fa-comments-dollar text-2xl text-green-600"></i>
+        <div class="text-right">
+          <p class="text-gray-500">Income</p>
+          <p id="incomeCard" class="text-green-600 text-2xl font-bold">$0</p>
+        </div>
+      </div>
+      <div class="bg-white p-4 px-12 rounded shadow flex items-center justify-between">
+        <i class="fa-solid fa-user-minus text-2xl text-red-600"></i>
+        <div class="text-right">
+          <p class="text-gray-500">Expenses</p>
+          <p id="expenseCard" class="text-red-600 text-2xl font-bold">$0</p>
+        </div>
+      </div>
+      <div class="bg-white p-4 px-12 rounded shadow flex items-center justify-between">
+        <i class="fa-solid fa-scale-balanced text-2xl text-blue-600"></i>
+        <div class="text-right">
+          <p class="text-gray-500">Balance</p>
+          <p id="balanceCard" class="text-blue-600 text-2xl font-bold">$0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Entry -->
+    <div class="bg-white p-4 rounded shadow space-y-2">
+      <h3 class="font-semibold">Add Income / Expense</h3>
+      <select id="type" class="w-full p-2 border rounded text-purple-600">
+        <option value="">Select Type</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <select id="categorySelect" class="w-full p-2 border rounded text-purple-600">
+        <option value="">Select Category</option>
+      </select>
+      <input type="number" id="amount" placeholder="Amount $" class="w-full p-2 text-purple-600 border rounded">
+      <input type="date" id="date" class="w-full p-2 border text-purple-600 rounded">
+      <input type="text" id="note" placeholder="Note" class="w-full p-2 border text-purple-600 rounded">
+      <button id="addEntryBtn" class="w-full bg-purple-500 transition-all hover:bg-purple-800 text-white p-2 rounded">Add Entry</button>
+    </div>
+
+    <!-- Filter -->
+    <div class="bg-white p-4 rounded shadow flex flex-wrap gap-2 items-center">
+      <span>Filter: </span>
+      <select id="filterRange" class="p-2 text-purple-600 font-bold">
+        <option value="week">This Week</option>
+        <option value="month" selected>This Month</option>
+        <option value="year">This Year</option>
+        <option value="thisYear">Last Week</option>
+        <option value="lastMonth">Last Month</option>
+        <option value="lastYear">Last Year</option>
+      </select>
+      <button id="refreshBtn" class=" text-dark px-3 py-1"><i class="fa-solid fa-retweet"></i></button>
+    </div>
+
+    <!-- Single Modern Chart -->
+    <div class="bg-white p-4 rounded shadow">
+      <canvas id="summaryChart"></canvas>
+    </div>
+
+    <!-- Entries Table -->
+    <div class="bg-white p-4 rounded shadow mt-4 overflow-x-auto">
+      <h3 class="font-semibold mb-2">Transaction Histories</h3>
+      <table class="w-full table-auto hidden sm:table">
+        <thead>
+          <tr class="bg-purple-300">
+            <th class="px-2 py-1 text-start">Type</th>
+            <th class="px-2 py-1 text-start">Category</th>
+            <th class="px-2 py-1 text-start">Amount</th>
+            <th class="px-2 py-1 text-start">Date</th>
+            <th class="px-2 py-1 text-start">Note</th>
+            <th class="px-2 py-1 text-start">Action</th>
+          </tr>
+        </thead>
+        <tbody id="entriesTable"></tbody>
+      </table>
+
+      <!-- Mobile Card List -->
+      <div id="entriesCards" class="flex flex-col gap-4 sm:hidden mt-2"></div>
+    </div>
+
+  </section>
+
+</main>
+<footer class="text-gray-500 font-semibold flex justify-center items-center pb-6">@Developed by seavmeng</footer>
+</body>
+</html>  
